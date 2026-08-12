@@ -1,0 +1,1110 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GymTrack | سجل تمارينك</title>
+<style>
+:root{--bg:#0b0d10;--card:rgba(20,23,28,.88);--muted:#a9b0ba;--text:#fff;--accent:#8cff00;--accent2:#d8ff9c;--border:rgba(255,255,255,.09)}
+*{box-sizing:border-box} body{margin:0;font-family:Tahoma,Arial,sans-serif;color:var(--text);background:#08090b;min-height:100vh}
+body:before{content:"";position:fixed;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.52),rgba(0,0,0,.9)),url("https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=2200&q=85") center/cover fixed;z-index:-2}
+body:after{content:"";position:fixed;inset:0;background:radial-gradient(circle at 15% 10%,rgba(140,255,0,.12),transparent 32%),radial-gradient(circle at 90% 70%,rgba(0,180,255,.08),transparent 28%);z-index:-1;pointer-events:none}
+header{position:sticky;top:0;z-index:10;background:rgba(8,9,11,.78);backdrop-filter:blur(18px);border-bottom:1px solid var(--border)}
+.nav{max-width:1200px;margin:auto;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.logo{font-size:23px;font-weight:900;letter-spacing:.5px}.logo span{color:var(--accent)}
+.btn{border:0;border-radius:12px;padding:11px 16px;font-weight:800;cursor:pointer}.primary{background:var(--accent);color:#0b1005}.ghost{background:rgba(255,255,255,.07);color:#fff;border:1px solid var(--border)}
+main{max-width:1200px;margin:auto;padding:45px 20px 70px}.hero{max-width:780px;margin-bottom:28px}
+.eyebrow{color:var(--accent);font-weight:900}.hero h1{font-size:clamp(34px,6vw,64px);margin:10px 0;line-height:1.02}.hero p{color:#c9ced5;font-size:17px;line-height:1.8}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin:20px 0}.search{flex:1;min-width:220px;background:rgba(255,255,255,.08);border:1px solid var(--border);color:#fff;border-radius:12px;padding:13px 15px;font-size:15px;outline:none}
+.filters{display:flex;gap:8px;overflow:auto;padding-bottom:4px}.chip{white-space:nowrap;padding:10px 14px;border-radius:999px;background:rgba(255,255,255,.07);border:1px solid var(--border);color:#ddd;cursor:pointer}.chip.active{background:var(--accent);color:#0b1005;border-color:transparent}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:18px}
+.card{position:relative;overflow:hidden;background:var(--card);border:1px solid var(--border);border-radius:20px;box-shadow:0 18px 55px rgba(0,0,0,.25)}
+.card-img{height:150px;background-size:cover;background-position:center;position:relative}.card-img:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 15%,rgba(0,0,0,.78))}
+.card-title{position:absolute;bottom:13px;right:16px;left:16px;z-index:1;font-size:20px;font-weight:900}
+.card-body{padding:16px}.tag{display:inline-block;font-size:12px;color:var(--accent2);background:rgba(140,255,0,.1);padding:5px 9px;border-radius:8px;margin-bottom:12px}
+.inputs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}.field label{display:block;color:var(--muted);font-size:11px;margin-bottom:5px}.field input{width:100%;background:#101319;border:1px solid #2b3038;color:#fff;border-radius:9px;padding:10px;text-align:center;font-size:14px;outline:none}.field input:focus{border-color:var(--accent)}
+.save{width:100%;margin-top:12px;background:#191e24;color:#fff;border:1px solid var(--border);padding:10px;border-radius:10px;font-weight:800;cursor:pointer}.save.saved{background:rgba(140,255,0,.13);color:var(--accent);border-color:rgba(140,255,0,.35)}
+.empty{display:none;padding:35px;text-align:center;color:var(--muted);grid-column:1/-1}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:25px 0}.stat{background:rgba(15,17,21,.8);border:1px solid var(--border);border-radius:15px;padding:16px}.stat b{display:block;font-size:25px;color:var(--accent)}.stat small{color:var(--muted)}
+@media(max-width:600px){.nav{padding:13px 15px}.nav .ghost{display:none}main{padding:30px 14px}.stats{grid-template-columns:1fr 1fr}.stats .stat:last-child{grid-column:1/-1}}
+
+.info{width:100%;margin:0 0 12px;background:rgba(140,255,0,.08);color:#d8ff9c;border:1px solid rgba(140,255,0,.2);padding:9px;border-radius:10px;font-weight:800;cursor:pointer}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.78);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:18px;z-index:100}
+.modal.show{display:flex}.modal-box{width:min(620px,100%);max-height:90vh;overflow:auto;background:#15191f;border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:22px;box-shadow:0 25px 80px #000}
+.modal-box h2{margin:0 0 8px}.modal-box p,.modal-box li{color:#cbd0d7;line-height:1.8}.close{float:left;background:#252a32;color:#fff;border:0;border-radius:9px;padding:8px 12px;cursor:pointer}.video-link{display:inline-block;margin-top:10px;background:#8cff00;color:#0b1005;padding:10px 14px;border-radius:10px;text-decoration:none;font-weight:900}
+</style>
+</head>
+<body>
+<header><div class="nav"><div class="logo">GYM<span>TRACK</span></div><button class="btn ghost" onclick="clearAll()">مسح البيانات</button></div></header>
+<main>
+<section class="hero">
+<div class="eyebrow">سجّل • تابع • تطوّر</div>
+<h1>تمارينك، أوزانك وتكراراتك في مكان واحد.</h1>
+<p>اختر العضلة، سجّل الوزن والتكرارات والمجموعات، وسيتم حفظ بياناتك تلقائياً على جهازك.</p>
+</section>
+<div class="stats">
+<div class="stat"><b id="count">0</b><small>تمارين محفوظة</small></div>
+<div class="stat"><b id="volume">0</b><small>إجمالي التكرارات</small></div>
+<div class="stat"><b id="weight">0</b><small>أعلى وزن مسجل (كجم)</small></div>
+</div>
+<div style="margin:12px 0 20px;padding:12px 14px;border-radius:12px;background:rgba(255,255,255,.05);color:#bfc5cc;font-size:13px">
+إذا كنت تفتح الملف من تطبيق «الملفات» على iPhone/iPad، استخدم نسخة الموقع المستضافة على الويب لتعمل ميزات الحفظ والبحث والمؤقت بشكل كامل.
+</div><div class="toolbar"><input id="search" class="search" placeholder="ابحث عن تمرين..." oninput="render()"></div>
+<div class="filters" id="filters"></div>
+<div class="grid" id="grid"></div>
+<noscript>
+  <div style="margin:18px 0;padding:15px;border:1px solid rgba(140,255,0,.3);border-radius:14px;background:rgba(140,255,0,.08);color:#d8ff9c;font-weight:800">
+    وضع المعاينة: تم عرض التمارين بدون JavaScript. على iPhone/iPad، تطبيق «الملفات» قد يعرض HTML كمعاينة ولا يشغّل JavaScript.
+  </div>
+  <div class="grid">
+    
+    <article class="card">
+      <div class="card-img" style="background-image:url('https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?auto=format&fit=crop&w=900&q=80')">
+        <div class="card-title">بنش برس بالبار</div>
+      </div>
+      <div class="card-body">
+        <span class="tag">صدر</span>
+        <div class="inputs">
+          <div class="field"><label>المجموعات</label><input type="number" value="3" disabled></div>
+          <div class="field"><label>التكرارات</label><input type="number" value="10" disabled></div>
+          <div class="field"><label>الوزن (كجم)</label><input type="number" value="0" disabled></div>
+        </div>
+        <div style="margin-top:10px;color:#a9b0ba;font-size:12px">للتسجيل والحفظ التفاعلي افتح الموقع عبر متصفح/استضافة ويب.</div>
+      </div>
+    </article>
+    <article class="card">
+      <div class="card-img" style="background-image:url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=900&q=80')">
+        <div class="card-title">بنش برس بالدمبل</div>
+      </div>
+      <div class="card-body">
+        <span class="tag">صدر</span>
+        <div class="inputs">
+          <div class="field"><label>المجموعات</label><input type="number" value="3" disabled></div>
+          <div class="field"><label>التكرارات</label><input type="number" value="10" disabled></div>
+          <div class="field"><label>الوزن (كجم)</label><input type="number" value="0" disabled></div>
+        </div>
+        <div style="margin-top:10px;color:#a9b0ba;font-size:12px">للتسجيل والحفظ التفاعلي افتح الموقع عبر متصفح/استضافة ويب.</div>
+      </div>
+    </article>
+    <article class="card">
+      <div class="card-img" style="background-image:url('https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=900&q=80')">
+        <div class="card-title">بنش مائل بالبار</div>
+      </div>
+      <div class="card-body">
+        <span class="tag">صدر</span>
+        <div class="inputs">
+          <div class="field"><label>المجموعات</label><input type="number" value="3" disabled></div>
+          <div class="field"><label>التكرارات</label><input type="number" value="10" disabled></div>
+          <div class="field"><label>الوزن (كجم)</label><input type="number" value="0" disabled></div>
+        </div>
+        <div style="margin-top:10px;color:#a9b0ba;font-size:12px">للتسجيل والحفظ التفاعلي افتح الموقع عبر متصفح/استضافة ويب.</div>
+      </div>
+    </article>
+    <article class="card">
+      <div class="card-img" style="background-image:url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=900&q=80')">
+        <div class="card-title">بنش مائل بالدمبل</div>
+      </div>
+      <div class="card-body">
+        <span class="tag">صدر</span>
+        <div class="inputs">
+          <div class="field"><label>المجموعات</label><input type="number" value="3" disabled></div>
+          <div class="field"><label>التكرارات</label><input type="number" value="10" disabled></div>
+          <div class="field"><label>الوزن (كجم)</label><input type="number" value="0" disabled></div>
+        </div>
+        <div style="margin-top:10px;color:#a9b0ba;font-size:12px">للتسجيل والحفظ التفاعلي افتح الموقع عبر متصفح/استضافة ويب.</div>
+      </div>
+    </article>
+    <article class="card">
+      <div class="card-img" style="background-image:url('https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?auto=format&fit=crop&w=900&q=80')">
+        <div class="card-title">بنش مائل للأسفل</div>
+      </div>
+      <div class="card-body">
+        <span class="tag">صدر</span>
+        <div class="inputs">
+          <div class="field"><label>المجموعات</label><input type="number" value="3" disabled></div>
+          <div class="field"><label>التكرارات</label><input type="number" value="10" disabled></div>
+          <div class="field"><label>الوزن (كجم)</label><input type="number" value="0" disabled></div>
+        </div>
+        <div style="margin-top:10px;color:#a9b0ba;font-size:12px">للتسجيل والحفظ التفاعلي افتح الموقع عبر متصفح/استضافة ويب.</div>
+      </div>
+    </article>
+    <article class="card">
+      <div class="card-img" style="background-image:url('https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=900&q=80')">
+        <div class="card-title">تفتيح دمبل</div>
+      </div>
+      <div class="card-body">
+        <span class="tag">صدر</span>
+        <div class="inputs">
+          <div class="field"><label>المجموعات</label><input type="number" value="3" disabled></div>
+          <div class="field"><label>التكرارات</label><input type="number" value="10" disabled></div>
+          <div class="field"><label>الوزن (كجم)</label><input type="number" value="0" disabled></div>
+        </div>
+        <div style="margin-top:10px;color:#a9b0ba;font-size:12px">للتسجيل والحفظ التفاعلي افتح الموقع عبر متصفح/استضافة ويب.</div>
+      </div>
+    </article>
+    <article class="card">
+      <div class="card-img" style="background-image:url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=900&q=80')">
+        <div class="card-title">كيبل فلاي</div>
+      </div>
+      <div class="card-body">
+        <span class="tag">صدر</span>
+        <div class="inputs">
+          <div class="field"><label>المجموعات</label><input type="number" value="3" disabled></div>
+          <div class="field"><label>التكرارات</label><input type="number" value="10" disabled></div>
+          <div class="field"><label>الوزن (كجم)</label><input type="number" value="0" disabled></div>
+        </div>
+        <div style="margin-top:10px;color:#a9b0ba;font-size:12px">للتسجيل والحفظ التفاعلي افتح الموقع عبر متصفح/استضافة ويب.</div>
+      </div>
+    </article>
+    <article class="card">
+      <div class="card-img" style="background-image:url('https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?auto=format&fit=crop&w=900&q=80')">
+        <div class="card-title">بيك ديك</div>
+      </div>
+      <div class="card-body">
+        <span class="tag">صدر</span>
+        <div class="inputs">
+          <div class="field"><label>المجموعات</label><input type="number" value="3" disabled></div>
+          <div class="field"><label>التكرارات</label><input type="number" value="10" disabled></div>
+          <div class="field"><label>الوزن (كجم)</label><input type="number" value="0" disabled></div>
+        </div>
+        <div style="margin-top:10px;color:#a9b0ba;font-size:12px">للتسجيل والحفظ التفاعلي افتح الموقع عبر متصفح/استضافة ويب.</div>
+      </div>
+    </article>
+    <article class="card">
+      <div class="card-img" style="background-image:url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=900&q=80')">
+        <div class="card-title">ضغط صدر جهاز</div>
+      </div>
+      <div class="card-body">
+        <span class="tag">صدر</span>
+        <div class="inputs">
+          <div class="field"><label>المجموعات</label><input type="number" value="3" disabled></div>
+          <div class="field"><label>التكرارات</label><input type="number" value="10" disabled></div>
+          <div class="field"><label>الوزن (كجم)</label><input type="number" value="0" disabled></div>
+        </div>
+        <div style="margin-top:10px;color:#a9b0ba;font-size:12px">للتسجيل والحفظ التفاعلي افتح الموقع عبر متصفح/استضافة ويب.</div>
+      </div>
+    </article>
+    <article class="card">
+      <div class="card-img" style="background-image:url('https://images.unsplash.com/photo-1598971639058-fab3c3109a00?auto=format&fit=crop&w=900&q=80')">
+        <div class="card-title">ضغط أرضي</div>
+      </div>
+      <div class="card-body">
+        <span class="tag">صدر</span>
+        <div class="inputs">
+          <div class="field"><label>المجموعات</label><input type="number" value="3" disabled></div>
+          <div class="field"><label>التكرارات</label><input type="number" value="10" disabled></div>
+          <div class="field"><label>الوزن (كجم)</label><input type="number" value="0" disabled></div>
+        </div>
+        <div style="margin-top:10px;color:#a9b0ba;font-size:12px">للتسجيل والحفظ التفاعلي افتح الموقع عبر متصفح/استضافة ويب.</div>
+      </div>
+    </article>
+    <article class="card">
+      <div class="card-img" style="background-image:url('https://images.unsplash.com/photo-1603287681836-b174ce5074c2?auto=format&fit=crop&w=900&q=80')">
+        <div class="card-title">سحب أمامي واسع</div>
+      </div>
+      <div class="card-body">
+        <span class="tag">ظهر</span>
+        <div class="inputs">
+          <div class="field"><label>المجموعات</label><input type="number" value="3" disabled></div>
+          <div class="field"><label>التكرارات</label><input type="number" value="10" disabled></div>
+          <div class="field"><label>الوزن (كجم)</label><input type="number" value="0" disabled></div>
+        </div>
+        <div style="margin-top:10px;color:#a9b0ba;font-size:12px">للتسجيل والحفظ التفاعلي افتح الموقع عبر متصفح/استضافة ويب.</div>
+      </div>
+    </article>
+    <article class="card">
+      <div class="card-img" style="background-image:url('https://images.unsplash.com/photo-1603287681836-b174ce5074c2?auto=format&fit=crop&w=900&q=80')">
+        <div class="card-title">سحب أمامي قبضة ضيقة</div>
+      </div>
+      <div class="card-body">
+        <span class="tag">ظهر</span>
+        <div class="inputs">
+          <div class="field"><label>المجموعات</label><input type="number" value="3" disabled></div>
+          <div class="field"><label>التكرارات</label><input type="number" value="10" disabled></div>
+          <div class="field"><label>الوزن (كجم)</label><input type="number" value="0" disabled></div>
+        </div>
+        <div style="margin-top:10px;color:#a9b0ba;font-size:12px">للتسجيل والحفظ التفاعلي افتح الموقع عبر متصفح/استضافة ويب.</div>
+      </div>
+    </article>
+    <article class="card">
+      <div class="card-img" style="background-image:url('https://images.unsplash.com/photo-1598971639058-fab3c3109a00?auto=format&fit=crop&w=900&q=80')">
+        <div class="card-title">عقلة</div>
+      </div>
+      <div class="card-body">
+        <span class="tag">ظهر</span>
+        <div class="inputs">
+          <div class="field"><label>المجموعات</label><input type="number" value="3" disabled></div>
+          <div class="field"><label>التكرارات</label><input type="number" value="10" disabled></div>
+          <div class="field"><label>الوزن (كجم)</label><input type="number" value="0" disabled></div>
+        </div>
+        <div style="margin-top:10px;color:#a9b0ba;font-size:12px">للتسجيل والحفظ التفاعلي افتح الموقع عبر متصفح/استضافة ويب.</div>
+      </div>
+    </article>
+    <article class="card">
+      <div class="card-img" style="background-image:url('https://images.unsplash.com/photo-1598971639058-fab3c3109a00?auto=format&fit=crop&w=900&q=80')">
+        <div class="card-title">باربل رو</div>
+      </div>
+      <div class="card-body">
+        <span class="tag">ظهر</span>
+        <div class="inputs">
+          <div class="field"><label>المجموعات</label><input type="number" value="3" disabled></div>
+          <div class="field"><label>التكرارات</label><input type="number" value="10" disabled></div>
+          <div class="field"><label>الوزن (كجم)</label><input type="number" value="0" disabled></div>
+        </div>
+        <div style="margin-top:10px;color:#a9b0ba;font-size:12px">للتسجيل والحفظ التفاعلي افتح الموقع عبر متصفح/استضافة ويب.</div>
+      </div>
+    </article>
+    <article class="card">
+      <div class="card-img" style="background-image:url('https://images.unsplash.com/photo-1603287681836-b174ce5074c2?auto=format&fit=crop&w=900&q=80')">
+        <div class="card-title">دمبل رو يد واحدة</div>
+      </div>
+      <div class="card-body">
+        <span class="tag">ظهر</span>
+        <div class="inputs">
+          <div class="field"><label>المجموعات</label><input type="number" value="3" disabled></div>
+          <div class="field"><label>التكرارات</label><input type="number" value="10" disabled></div>
+          <div class="field"><label>الوزن (كجم)</label><input type="number" value="0" disabled></div>
+        </div>
+        <div style="margin-top:10px;color:#a9b0ba;font-size:12px">للتسجيل والحفظ التفاعلي افتح الموقع عبر متصفح/استضافة ويب.</div>
+      </div>
+    </article>
+    <article class="card">
+      <div class="card-img" style="background-image:url('https://images.unsplash.com/photo-1598971639058-fab3c3109a00?auto=format&fit=crop&w=900&q=80')">
+        <div class="card-title">تي بار رو</div>
+      </div>
+      <div class="card-body">
+        <span class="tag">ظهر</span>
+        <div class="inputs">
+          <div class="field"><label>المجموعات</label><input type="number" value="3" disabled></div>
+          <div class="field"><label>التكرارات</label><input type="number" value="10" disabled></div>
+          <div class="field"><label>الوزن (كجم)</label><input type="number" value="0" disabled></div>
+        </div>
+        <div style="margin-top:10px;color:#a9b0ba;font-size:12px">للتسجيل والحفظ التفاعلي افتح الموقع عبر متصفح/استضافة ويب.</div>
+      </div>
+    </article>
+    <article class="card">
+      <div class="card-img" style="background-image:url('https://images.unsplash.com/photo-1576678927484-cc907957088c?auto=format&fit=crop&w=900&q=80')">
+        <div class="card-title">سيتد كيبل رو</div>
+      </div>
+      <div class="card-body">
+        <span class="tag">ظهر</span>
+        <div class="inputs">
+          <div class="field"><label>المجموعات</label><input type="number" value="3" disabled></div>
+          <div class="field"><label>التكرارات</label><input type="number" value="10" disabled></div>
+          <div class="field"><label>الوزن (كجم)</label><input type="number" value="0" disabled></div>
+        </div>
+        <div style="margin-top:10px;color:#a9b0ba;font-size:12px">للتسجيل والحفظ التفاعلي افتح الموقع عبر متصفح/استضافة ويب.</div>
+      </div>
+    </article>
+    <article class="card">
+      <div class="card-img" style="background-image:url('https://images.unsplash.com/photo-1603287681836-b174ce5074c2?auto=format&fit=crop&w=900&q=80')">
+        <div class="card-title">ستريت آرم بول داون</div>
+      </div>
+      <div class="card-body">
+        <span class="tag">ظهر</span>
+        <div class="inputs">
+          <div class="field"><label>المجموعات</label><input type="number" value="3" disabled></div>
+          <div class="field"><label>التكرارات</label><input type="number" value="10" disabled></div>
+          <div class="field"><label>الوزن (كجم)</label><input type="number" value="0" disabled></div>
+        </div>
+        <div style="margin-top:10px;color:#a9b0ba;font-size:12px">للتسجيل والحفظ التفاعلي افتح الموقع عبر متصفح/استضافة ويب.</div>
+      </div>
+    </article>
+    <article class="card">
+      <div class="card-img" style="background-image:url('https://images.unsplash.com/photo-1598971639058-fab3c3109a00?auto=format&fit=crop&w=900&q=80')">
+        <div class="card-title">ديدلفت</div>
+      </div>
+      <div class="card-body">
+        <span class="tag">ظهر</span>
+        <div class="inputs">
+          <div class="field"><label>المجموعات</label><input type="number" value="3" disabled></div>
+          <div class="field"><label>التكرارات</label><input type="number" value="10" disabled></div>
+          <div class="field"><label>الوزن (كجم)</label><input type="number" value="0" disabled></div>
+        </div>
+        <div style="margin-top:10px;color:#a9b0ba;font-size:12px">للتسجيل والحفظ التفاعلي افتح الموقع عبر متصفح/استضافة ويب.</div>
+      </div>
+    </article>
+    <article class="card">
+      <div class="card-img" style="background-image:url('https://images.unsplash.com/photo-1598971639058-fab3c3109a00?auto=format&fit=crop&w=900&q=80')">
+        <div class="card-title">شراگ بار</div>
+      </div>
+      <div class="card-body">
+        <span class="tag">ظهر</span>
+        <div class="inputs">
+          <div class="field"><label>المجموعات</label><input type="number" value="3" disabled></div>
+          <div class="field"><label>التكرارات</label><input type="number" value="10" disabled></div>
+          <div class="field"><label>الوزن (كجم)</label><input type="number" value="0" disabled></div>
+        </div>
+        <div style="margin-top:10px;color:#a9b0ba;font-size:12px">للتسجيل والحفظ التفاعلي افتح الموقع عبر متصفح/استضافة ويب.</div>
+      </div>
+    </article>
+    <article class="card">
+      <div class="card-img" style="background-image:url('https://images.unsplash.com/photo-1534367610401-9f5ed68180aa?auto=format&fit=crop&w=900&q=80')">
+        <div class="card-title">ضغط كتف بالبار</div>
+      </div>
+      <div class="card-body">
+        <span class="tag">أكتاف</span>
+        <div class="inputs">
+          <div class="field"><label>المجموعات</label><input type="number" value="3" disabled></div>
+          <div class="field"><label>التكرارات</label><input type="number" value="10" disabled></div>
+          <div class="field"><label>الوزن (كجم)</label><input type="number" value="0" disabled></div>
+        </div>
+        <div style="margin-top:10px;color:#a9b0ba;font-size:12px">للتسجيل والحفظ التفاعلي افتح الموقع عبر متصفح/استضافة ويب.</div>
+      </div>
+    </article>
+    <article class="card">
+      <div class="card-img" style="background-image:url('https://images.unsplash.com/photo-1534367610401-9f5ed68180aa?auto=format&fit=crop&w=900&q=80')">
+        <div class="card-title">ضغط كتف دمبل</div>
+      </div>
+      <div class="card-body">
+        <span class="tag">أكتاف</span>
+        <div class="inputs">
+          <div class="field"><label>المجموعات</label><input type="number" value="3" disabled></div>
+          <div class="field"><label>التكرارات</label><input type="number" value="10" disabled></div>
+          <div class="field"><label>الوزن (كجم)</label><input type="number" value="0" disabled></div>
+        </div>
+        <div style="margin-top:10px;color:#a9b0ba;font-size:12px">للتسجيل والحفظ التفاعلي افتح الموقع عبر متصفح/استضافة ويب.</div>
+      </div>
+    </article>
+    <article class="card">
+      <div class="card-img" style="background-image:url('https://images.unsplash.com/photo-1534367610401-9f5ed68180aa?auto=format&fit=crop&w=900&q=80')">
+        <div class="card-title">ضغط كتف جهاز</div>
+      </div>
+      <div class="card-body">
+        <span class="tag">أكتاف</span>
+        <div class="inputs">
+          <div class="field"><label>المجموعات</label><input type="number" value="3" disabled></div>
+          <div class="field"><label>التكرارات</label><input type="number" value="10" disabled></div>
+          <div class="field"><label>الوزن (كجم)</label><input type="number" value="0" disabled></div>
+        </div>
+        <div style="margin-top:10px;color:#a9b0ba;font-size:12px">للتسجيل والحفظ التفاعلي افتح الموقع عبر متصفح/استضافة ويب.</div>
+      </div>
+    </article>
+    <article class="card">
+      <div class="card-img" style="background-image:url('https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?auto=format&fit=crop&w=900&q=80')">
+        <div class="card-title">رفرفة جانبية دمبل</div>
+      </div>
+      <div class="card-body">
+        <span class="tag">أكتاف</span>
+        <div class="inputs">
+          <div class="field"><label>المجموعات</label><input type="number" value="3" disabled></div>
+          <div class="field"><label>التكرارات</label><input type="number" value="10" disabled></div>
+          <div class="field"><label>الوزن (كجم)</label><input type="number" value="0" disabled></div>
+        </div>
+        <div style="margin-top:10px;color:#a9b0ba;font-size:12px">للتسجيل والحفظ التفاعلي افتح الموقع عبر متصفح/استضافة ويب.</div>
+      </div>
+    </article>
+    <article class="card">
+      <div class="card-img" style="background-image:url('https://images.unsplash.com/photo-1574680096145-d05b474e2155?auto=format&fit=crop&w=900&q=80')">
+        <div class="card-title">رفرفة جانبية كيبل</div>
+      </div>
+      <div class="card-body">
+        <span class="tag">أكتاف</span>
+        <div class="inputs">
+          <div class="field"><label>المجموعات</label><input type="number" value="3" disabled></div>
+          <div class="field"><label>التكرارات</label><input type="number" value="10" disabled></div>
+          <div class="field"><label>الوزن (كجم)</label><input type="number" value="0" disabled></div>
+        </div>
+        <div style="margin-top:10px;color:#a9b0ba;font-size:12px">للتسجيل والحفظ التفاعلي افتح الموقع عبر متصفح/استضافة ويب.</div>
+      </div>
+    </article>
+    <article class="card">
+      <div class="card-img" style="background-image:url('https://images.unsplash.com/photo-1534367610401-9f5ed68180aa?auto=format&fit=crop&w=900&q=80')">
+        <div class="card-title">رفرفة أمامية دمبل</div>
+      </div>
+      <div class="card-body">
+        <span class="tag">أكتاف</span>
+        <div class="inputs">
+          <div class="field"><label>المجموعات</label><input type="number" value="3" disabled></div>
+          <div class="field"><label>التكرارات</label><input type="number" value="10" disabled></div>
+          <div class="field"><label>الوزن (كجم)</label><input type="number" value="0" disabled></div>
+        </div>
+        <div style="margin-top:10px;color:#a9b0ba;font-size:12px">للتسجيل والحفظ التفاعلي افتح الموقع عبر متصفح/استضافة ويب.</div>
+      </div>
+    </article>
+    <article class="card">
+      <div class="card-img" style="background-image:url('https://images.unsplash.com/photo-1574680096145-d05b474e2155?auto=format&fit=crop&w=900&q=80')">
+        <div class="card-title">رفرفة خلفية</div>
+      </div>
+      <div class="card-body">
+        <span class="tag">أكتاف</span>
+        <div class="inputs">
+          <div class="field"><label>المجموعات</label><input type="number" value="3" disabled></div>
+          <div class="field"><label>التكرارات</label><input type="number" value="10" disabled></div>
+          <div class="field"><label>الوزن (كجم)</label><input type="number" value="0" disabled></div>
+        </div>
+        <div style="margin-top:10px;color:#a9b0ba;font-size:12px">للتسجيل والحفظ التفاعلي افتح الموقع عبر متصفح/استضافة ويب.</div>
+      </div>
+    </article>
+    <article class="card">
+      <div class="card-img" style="background-image:url('https://images.unsplash.com/photo-1574680096145-d05b474e2155?auto=format&fit=crop&w=900&q=80')">
+        <div class="card-title">فيس بول</div>
+      </div>
+      <div class="card-body">
+        <span class="tag">أكتاف</span>
+        <div class="inputs">
+          <div class="field"><label>المجموعات</label><input type="number" value="3" disabled></div>
+          <div class="field"><label>التكرارات</label><input type="number" value="10" disabled></div>
+          <div class="field"><label>الوزن (كجم)</label><input type="number" value="0" disabled></div>
+        </div>
+        <div style="margin-top:10px;color:#a9b0ba;font-size:12px">للتسجيل والحفظ التفاعلي افتح الموقع عبر متصفح/استضافة ويب.</div>
+      </div>
+    </article>
+    <article class="card">
+      <div class="card-img" style="background-image:url('https://images.unsplash.com/photo-1538805060514-97d9cc17730c?auto=format&fit=crop&w=900&q=80')">
+        <div class="card-title">سكوات بالبار</div>
+      </div>
+      <div class="card-body">
+        <span class="tag">أرجل</span>
+        <div class="inputs">
+          <div class="field"><label>المجموعات</label><input type="number" value="3" disabled></div>
+          <div class="field"><label>التكرارات</label><input type="number" value="10" disabled></div>
+          <div class="field"><label>الوزن (كجم)</label><input type="number" value="0" disabled></div>
+        </div>
+        <div style="margin-top:10px;color:#a9b0ba;font-size:12px">للتسجيل والحفظ التفاعلي افتح الموقع عبر متصفح/استضافة ويب.</div>
+      </div>
+    </article>
+    <article class="card">
+      <div class="card-img" style="background-image:url('https://images.unsplash.com/photo-1538805060514-97d9cc17730c?auto=format&fit=crop&w=900&q=80')">
+        <div class="card-title">فرونت سكوات</div>
+      </div>
+      <div class="card-body">
+        <span class="tag">أرجل</span>
+        <div class="inputs">
+          <div class="field"><label>المجموعات</label><input type="number" value="3" disabled></div>
+          <div class="field"><label>التكرارات</label><input type="number" value="10" disabled></div>
+          <div class="field"><label>الوزن (كجم)</label><input type="number" value="0" disabled></div>
+        </div>
+        <div style="margin-top:10px;color:#a9b0ba;font-size:12px">للتسجيل والحفظ التفاعلي افتح الموقع عبر متصفح/استضافة ويب.</div>
+      </div>
+    </article>
+    <article class="card">
+      <div class="card-img" style="background-image:url('https://images.unsplash.com/photo-1434596922112-19c563067271?auto=format&fit=crop&w=900&q=80')">
+        <div class="card-title">هاك سكوات</div>
+      </div>
+      <div class="card-body">
+        <span class="tag">أرجل</span>
+        <div class="inputs">
+          <div class="field"><label>المجموعات</label><input type="number" value="3" disabled></div>
+          <div class="field"><label>التكرارات</label><input type="number" value="10" disabled></div>
+          <div class="field"><label>الوزن (كجم)</label><input type="number" value="0" disabled></div>
+        </div>
+        <div style="margin-top:10px;color:#a9b0ba;font-size:12px">للتسجيل والحفظ التفاعلي افتح الموقع عبر متصفح/استضافة ويب.</div>
+      </div>
+    </article>
+    <article class="card">
+      <div class="card-img" style="background-image:url('https://images.unsplash.com/photo-1434596922112-19c563067271?auto=format&fit=crop&w=900&q=80')">
+        <div class="card-title">ليج برس</div>
+      </div>
+      <div class="card-body">
+        <span class="tag">أرجل</span>
+        <div class="inputs">
+          <div class="field"><label>المجموعات</label><input type="number" value="3" disabled></div>
+          <div class="field"><label>التكرارات</label><input type="number" value="10" disabled></div>
+          <div class="field"><label>الوزن (كجم)</label><input type="number" value="0" disabled></div>
+        </div>
+        <div style="margin-top:10px;color:#a9b0ba;font-size:12px">للتسجيل والحفظ التفاعلي افتح الموقع عبر متصفح/استضافة ويب.</div>
+      </div>
+    </article>
+    <article class="card">
+      <div class="card-img" style="background-image:url('https://images.unsplash.com/photo-1538805060514-97d9cc17730c?auto=format&fit=crop&w=900&q=80')">
+        <div class="card-title">رومانيان ديدلفت</div>
+      </div>
+      <div class="card-body">
+        <span class="tag">أرجل</span>
+        <div class="inputs">
+          <div class="field"><label>المجموعات</label><input type="number" value="3" disabled></div>
+          <div class="field"><label>التكرارات</label><input type="number" value="10" disabled></div>
+          <div class="field"><label>الوزن (كجم)</label><input type="number" value="0" disabled></div>
+        </div>
+        <div style="margin-top:10px;color:#a9b0ba;font-size:12px">للتسجيل والحفظ التفاعلي افتح الموقع عبر متصفح/استضافة ويب.</div>
+      </div>
+    </article>
+    <article class="card">
+      <div class="card-img" style="background-image:url('https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?auto=format&fit=crop&w=900&q=80')">
+        <div class="card-title">ليج إكستنشن</div>
+      </div>
+      <div class="card-body">
+        <span class="tag">أرجل</span>
+        <div class="inputs">
+          <div class="field"><label>المجموعات</label><input type="number" value="3" disabled></div>
+          <div class="field"><label>التكرارات</label><input type="number" value="10" disabled></div>
+          <div class="field"><label>الوزن (كجم)</label><input type="number" value="0" disabled></div>
+        </div>
+        <div style="margin-top:10px;color:#a9b0ba;font-size:12px">للتسجيل والحفظ التفاعلي افتح الموقع عبر متصفح/استضافة ويب.</div>
+      </div>
+    </article>
+    <article class="card">
+      <div class="card-img" style="background-image:url('https://images.unsplash.com/photo-1434596922112-19c563067271?auto=format&fit=crop&w=900&q=80')">
+        <div class="card-title">ليج كيرل جالس</div>
+      </div>
+      <div class="card-body">
+        <span class="tag">أرجل</span>
+        <div class="inputs">
+          <div class="field"><label>المجموعات</label><input type="number" value="3" disabled></div>
+          <div class="field"><label>التكرارات</label><input type="number" value="10" disabled></div>
+          <div class="field"><label>الوزن (كجم)</label><input type="number" value="0" disabled></div>
+        </div>
+        <div style="margin-top:10px;color:#a9b0ba;font-size:12px">للتسجيل والحفظ التفاعلي افتح الموقع عبر متصفح/استضافة ويب.</div>
+      </div>
+    </article>
+    <article class="card">
+      <div class="card-img" style="background-image:url('https://images.unsplash.com/photo-1434596922112-19c563067271?auto=format&fit=crop&w=900&q=80')">
+        <div class="card-title">ليج كيرل مستلقٍ</div>
+      </div>
+      <div class="card-body">
+        <span class="tag">أرجل</span>
+        <div class="inputs">
+          <div class="field"><label>المجموعات</label><input type="number" value="3" disabled></div>
+          <div class="field"><label>التكرارات</label><input type="number" value="10" disabled></div>
+          <div class="field"><label>الوزن (كجم)</label><input type="number" value="0" disabled></div>
+        </div>
+        <div style="margin-top:10px;color:#a9b0ba;font-size:12px">للتسجيل والحفظ التفاعلي افتح الموقع عبر متصفح/استضافة ويب.</div>
+      </div>
+    </article>
+    <article class="card">
+      <div class="card-img" style="background-image:url('https://images.unsplash.com/photo-1538805060514-97d9cc17730c?auto=format&fit=crop&w=900&q=80')">
+        <div class="card-title">هيب ثرست</div>
+      </div>
+      <div class="card-body">
+        <span class="tag">أرجل</span>
+        <div class="inputs">
+          <div class="field"><label>المجموعات</label><input type="number" value="3" disabled></div>
+          <div class="field"><label>التكرارات</label><input type="number" value="10" disabled></div>
+          <div class="field"><label>الوزن (كجم)</label><input type="number" value="0" disabled></div>
+        </div>
+        <div style="margin-top:10px;color:#a9b0ba;font-size:12px">للتسجيل والحفظ التفاعلي افتح الموقع عبر متصفح/استضافة ويب.</div>
+      </div>
+    </article>
+    <article class="card">
+      <div class="card-img" style="background-image:url('https://images.unsplash.com/photo-1538805060514-97d9cc17730c?auto=format&fit=crop&w=900&q=80')">
+        <div class="card-title">لانجز</div>
+      </div>
+      <div class="card-body">
+        <span class="tag">أرجل</span>
+        <div class="inputs">
+          <div class="field"><label>المجموعات</label><input type="number" value="3" disabled></div>
+          <div class="field"><label>التكرارات</label><input type="number" value="10" disabled></div>
+          <div class="field"><label>الوزن (كجم)</label><input type="number" value="0" disabled></div>
+        </div>
+        <div style="margin-top:10px;color:#a9b0ba;font-size:12px">للتسجيل والحفظ التفاعلي افتح الموقع عبر متصفح/استضافة ويب.</div>
+      </div>
+    </article>
+    <article class="card">
+      <div class="card-img" style="background-image:url('https://images.unsplash.com/photo-1434596922112-19c563067271?auto=format&fit=crop&w=900&q=80')">
+        <div class="card-title">كالف ريز واقف</div>
+      </div>
+      <div class="card-body">
+        <span class="tag">أرجل</span>
+        <div class="inputs">
+          <div class="field"><label>المجموعات</label><input type="number" value="3" disabled></div>
+          <div class="field"><label>التكرارات</label><input type="number" value="10" disabled></div>
+          <div class="field"><label>الوزن (كجم)</label><input type="number" value="0" disabled></div>
+        </div>
+        <div style="margin-top:10px;color:#a9b0ba;font-size:12px">للتسجيل والحفظ التفاعلي افتح الموقع عبر متصفح/استضافة ويب.</div>
+      </div>
+    </article>
+    <article class="card">
+      <div class="card-img" style="background-image:url('https://images.unsplash.com/photo-1434596922112-19c563067271?auto=format&fit=crop&w=900&q=80')">
+        <div class="card-title">كالف ريز جالس</div>
+      </div>
+      <div class="card-body">
+        <span class="tag">أرجل</span>
+        <div class="inputs">
+          <div class="field"><label>المجموعات</label><input type="number" value="3" disabled></div>
+          <div class="field"><label>التكرارات</label><input type="number" value="10" disabled></div>
+          <div class="field"><label>الوزن (كجم)</label><input type="number" value="0" disabled></div>
+        </div>
+        <div style="margin-top:10px;color:#a9b0ba;font-size:12px">للتسجيل والحفظ التفاعلي افتح الموقع عبر متصفح/استضافة ويب.</div>
+      </div>
+    </article>
+    <article class="card">
+      <div class="card-img" style="background-image:url('https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=900&q=80')">
+        <div class="card-title">باربل كيرل</div>
+      </div>
+      <div class="card-body">
+        <span class="tag">بايسبس</span>
+        <div class="inputs">
+          <div class="field"><label>المجموعات</label><input type="number" value="3" disabled></div>
+          <div class="field"><label>التكرارات</label><input type="number" value="10" disabled></div>
+          <div class="field"><label>الوزن (كجم)</label><input type="number" value="0" disabled></div>
+        </div>
+        <div style="margin-top:10px;color:#a9b0ba;font-size:12px">للتسجيل والحفظ التفاعلي افتح الموقع عبر متصفح/استضافة ويب.</div>
+      </div>
+    </article>
+    <article class="card">
+      <div class="card-img" style="background-image:url('https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=900&q=80')">
+        <div class="card-title">EZ بار كيرل</div>
+      </div>
+      <div class="card-body">
+        <span class="tag">بايسبس</span>
+        <div class="inputs">
+          <div class="field"><label>المجموعات</label><input type="number" value="3" disabled></div>
+          <div class="field"><label>التكرارات</label><input type="number" value="10" disabled></div>
+          <div class="field"><label>الوزن (كجم)</label><input type="number" value="0" disabled></div>
+        </div>
+        <div style="margin-top:10px;color:#a9b0ba;font-size:12px">للتسجيل والحفظ التفاعلي افتح الموقع عبر متصفح/استضافة ويب.</div>
+      </div>
+    </article>
+    <article class="card">
+      <div class="card-img" style="background-image:url('https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=900&q=80')">
+        <div class="card-title">دمبل كيرل</div>
+      </div>
+      <div class="card-body">
+        <span class="tag">بايسبس</span>
+        <div class="inputs">
+          <div class="field"><label>المجموعات</label><input type="number" value="3" disabled></div>
+          <div class="field"><label>التكرارات</label><input type="number" value="10" disabled></div>
+          <div class="field"><label>الوزن (كجم)</label><input type="number" value="0" disabled></div>
+        </div>
+        <div style="margin-top:10px;color:#a9b0ba;font-size:12px">للتسجيل والحفظ التفاعلي افتح الموقع عبر متصفح/استضافة ويب.</div>
+      </div>
+    </article>
+    <article class="card">
+      <div class="card-img" style="background-image:url('https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=900&q=80')">
+        <div class="card-title">هامر كيرل</div>
+      </div>
+      <div class="card-body">
+        <span class="tag">بايسبس</span>
+        <div class="inputs">
+          <div class="field"><label>المجموعات</label><input type="number" value="3" disabled></div>
+          <div class="field"><label>التكرارات</label><input type="number" value="10" disabled></div>
+          <div class="field"><label>الوزن (كجم)</label><input type="number" value="0" disabled></div>
+        </div>
+        <div style="margin-top:10px;color:#a9b0ba;font-size:12px">للتسجيل والحفظ التفاعلي افتح الموقع عبر متصفح/استضافة ويب.</div>
+      </div>
+    </article>
+    <article class="card">
+      <div class="card-img" style="background-image:url('https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=900&q=80')">
+        <div class="card-title">بريشر كيرل</div>
+      </div>
+      <div class="card-body">
+        <span class="tag">بايسبس</span>
+        <div class="inputs">
+          <div class="field"><label>المجموعات</label><input type="number" value="3" disabled></div>
+          <div class="field"><label>التكرارات</label><input type="number" value="10" disabled></div>
+          <div class="field"><label>الوزن (كجم)</label><input type="number" value="0" disabled></div>
+        </div>
+        <div style="margin-top:10px;color:#a9b0ba;font-size:12px">للتسجيل والحفظ التفاعلي افتح الموقع عبر متصفح/استضافة ويب.</div>
+      </div>
+    </article>
+    <article class="card">
+      <div class="card-img" style="background-image:url('https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=900&q=80')">
+        <div class="card-title">كيبل كيرل</div>
+      </div>
+      <div class="card-body">
+        <span class="tag">بايسبس</span>
+        <div class="inputs">
+          <div class="field"><label>المجموعات</label><input type="number" value="3" disabled></div>
+          <div class="field"><label>التكرارات</label><input type="number" value="10" disabled></div>
+          <div class="field"><label>الوزن (كجم)</label><input type="number" value="0" disabled></div>
+        </div>
+        <div style="margin-top:10px;color:#a9b0ba;font-size:12px">للتسجيل والحفظ التفاعلي افتح الموقع عبر متصفح/استضافة ويب.</div>
+      </div>
+    </article>
+    <article class="card">
+      <div class="card-img" style="background-image:url('https://images.unsplash.com/photo-1598971639058-fab3c3109a00?auto=format&fit=crop&w=900&q=80')">
+        <div class="card-title">كيبل بوش داون</div>
+      </div>
+      <div class="card-body">
+        <span class="tag">ترايسبس</span>
+        <div class="inputs">
+          <div class="field"><label>المجموعات</label><input type="number" value="3" disabled></div>
+          <div class="field"><label>التكرارات</label><input type="number" value="10" disabled></div>
+          <div class="field"><label>الوزن (كجم)</label><input type="number" value="0" disabled></div>
+        </div>
+        <div style="margin-top:10px;color:#a9b0ba;font-size:12px">للتسجيل والحفظ التفاعلي افتح الموقع عبر متصفح/استضافة ويب.</div>
+      </div>
+    </article>
+    <article class="card">
+      <div class="card-img" style="background-image:url('https://images.unsplash.com/photo-1598971639058-fab3c3109a00?auto=format&fit=crop&w=900&q=80')">
+        <div class="card-title">روپ بوش داون</div>
+      </div>
+      <div class="card-body">
+        <span class="tag">ترايسبس</span>
+        <div class="inputs">
+          <div class="field"><label>المجموعات</label><input type="number" value="3" disabled></div>
+          <div class="field"><label>التكرارات</label><input type="number" value="10" disabled></div>
+          <div class="field"><label>الوزن (كجم)</label><input type="number" value="0" disabled></div>
+        </div>
+        <div style="margin-top:10px;color:#a9b0ba;font-size:12px">للتسجيل والحفظ التفاعلي افتح الموقع عبر متصفح/استضافة ويب.</div>
+      </div>
+    </article>
+    <article class="card">
+      <div class="card-img" style="background-image:url('https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?auto=format&fit=crop&w=900&q=80')">
+        <div class="card-title">سكَل كراشر</div>
+      </div>
+      <div class="card-body">
+        <span class="tag">ترايسبس</span>
+        <div class="inputs">
+          <div class="field"><label>المجموعات</label><input type="number" value="3" disabled></div>
+          <div class="field"><label>التكرارات</label><input type="number" value="10" disabled></div>
+          <div class="field"><label>الوزن (كجم)</label><input type="number" value="0" disabled></div>
+        </div>
+        <div style="margin-top:10px;color:#a9b0ba;font-size:12px">للتسجيل والحفظ التفاعلي افتح الموقع عبر متصفح/استضافة ويب.</div>
+      </div>
+    </article>
+    <article class="card">
+      <div class="card-img" style="background-image:url('https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?auto=format&fit=crop&w=900&q=80')">
+        <div class="card-title">تمديد فوق الرأس بالدمبل</div>
+      </div>
+      <div class="card-body">
+        <span class="tag">ترايسبس</span>
+        <div class="inputs">
+          <div class="field"><label>المجموعات</label><input type="number" value="3" disabled></div>
+          <div class="field"><label>التكرارات</label><input type="number" value="10" disabled></div>
+          <div class="field"><label>الوزن (كجم)</label><input type="number" value="0" disabled></div>
+        </div>
+        <div style="margin-top:10px;color:#a9b0ba;font-size:12px">للتسجيل والحفظ التفاعلي افتح الموقع عبر متصفح/استضافة ويب.</div>
+      </div>
+    </article>
+    <article class="card">
+      <div class="card-img" style="background-image:url('https://images.unsplash.com/photo-1598971639058-fab3c3109a00?auto=format&fit=crop&w=900&q=80')">
+        <div class="card-title">ديبس</div>
+      </div>
+      <div class="card-body">
+        <span class="tag">ترايسبس</span>
+        <div class="inputs">
+          <div class="field"><label>المجموعات</label><input type="number" value="3" disabled></div>
+          <div class="field"><label>التكرارات</label><input type="number" value="10" disabled></div>
+          <div class="field"><label>الوزن (كجم)</label><input type="number" value="0" disabled></div>
+        </div>
+        <div style="margin-top:10px;color:#a9b0ba;font-size:12px">للتسجيل والحفظ التفاعلي افتح الموقع عبر متصفح/استضافة ويب.</div>
+      </div>
+    </article>
+    <article class="card">
+      <div class="card-img" style="background-image:url('https://images.unsplash.com/photo-1549060279-7e168fcee0c2?auto=format&fit=crop&w=900&q=80')">
+        <div class="card-title">كرنش</div>
+      </div>
+      <div class="card-body">
+        <span class="tag">بطن</span>
+        <div class="inputs">
+          <div class="field"><label>المجموعات</label><input type="number" value="3" disabled></div>
+          <div class="field"><label>التكرارات</label><input type="number" value="10" disabled></div>
+          <div class="field"><label>الوزن (كجم)</label><input type="number" value="0" disabled></div>
+        </div>
+        <div style="margin-top:10px;color:#a9b0ba;font-size:12px">للتسجيل والحفظ التفاعلي افتح الموقع عبر متصفح/استضافة ويب.</div>
+      </div>
+    </article>
+    <article class="card">
+      <div class="card-img" style="background-image:url('https://images.unsplash.com/photo-1549060279-7e168fcee0c2?auto=format&fit=crop&w=900&q=80')">
+        <div class="card-title">كرنش كيبل</div>
+      </div>
+      <div class="card-body">
+        <span class="tag">بطن</span>
+        <div class="inputs">
+          <div class="field"><label>المجموعات</label><input type="number" value="3" disabled></div>
+          <div class="field"><label>التكرارات</label><input type="number" value="10" disabled></div>
+          <div class="field"><label>الوزن (كجم)</label><input type="number" value="0" disabled></div>
+        </div>
+        <div style="margin-top:10px;color:#a9b0ba;font-size:12px">للتسجيل والحفظ التفاعلي افتح الموقع عبر متصفح/استضافة ويب.</div>
+      </div>
+    </article>
+    <article class="card">
+      <div class="card-img" style="background-image:url('https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=900&q=80')">
+        <div class="card-title">رفع الأرجل</div>
+      </div>
+      <div class="card-body">
+        <span class="tag">بطن</span>
+        <div class="inputs">
+          <div class="field"><label>المجموعات</label><input type="number" value="3" disabled></div>
+          <div class="field"><label>التكرارات</label><input type="number" value="10" disabled></div>
+          <div class="field"><label>الوزن (كجم)</label><input type="number" value="0" disabled></div>
+        </div>
+        <div style="margin-top:10px;color:#a9b0ba;font-size:12px">للتسجيل والحفظ التفاعلي افتح الموقع عبر متصفح/استضافة ويب.</div>
+      </div>
+    </article>
+    <article class="card">
+      <div class="card-img" style="background-image:url('https://images.unsplash.com/photo-1549060279-7e168fcee0c2?auto=format&fit=crop&w=900&q=80')">
+        <div class="card-title">بلانك</div>
+      </div>
+      <div class="card-body">
+        <span class="tag">بطن</span>
+        <div class="inputs">
+          <div class="field"><label>المجموعات</label><input type="number" value="3" disabled></div>
+          <div class="field"><label>التكرارات</label><input type="number" value="10" disabled></div>
+          <div class="field"><label>الوزن (كجم)</label><input type="number" value="0" disabled></div>
+        </div>
+        <div style="margin-top:10px;color:#a9b0ba;font-size:12px">للتسجيل والحفظ التفاعلي افتح الموقع عبر متصفح/استضافة ويب.</div>
+      </div>
+    </article>
+    <article class="card">
+      <div class="card-img" style="background-image:url('https://images.unsplash.com/photo-1549060279-7e168fcee0c2?auto=format&fit=crop&w=900&q=80')">
+        <div class="card-title">روشن روسيان تويست</div>
+      </div>
+      <div class="card-body">
+        <span class="tag">بطن</span>
+        <div class="inputs">
+          <div class="field"><label>المجموعات</label><input type="number" value="3" disabled></div>
+          <div class="field"><label>التكرارات</label><input type="number" value="10" disabled></div>
+          <div class="field"><label>الوزن (كجم)</label><input type="number" value="0" disabled></div>
+        </div>
+        <div style="margin-top:10px;color:#a9b0ba;font-size:12px">للتسجيل والحفظ التفاعلي افتح الموقع عبر متصفح/استضافة ويب.</div>
+      </div>
+    </article>
+    <article class="card">
+      <div class="card-img" style="background-image:url('https://images.unsplash.com/photo-1538805060514-97d9cc17730c?auto=format&fit=crop&w=900&q=80')">
+        <div class="card-title">جري على السير</div>
+      </div>
+      <div class="card-body">
+        <span class="tag">كارديو</span>
+        <div class="inputs">
+          <div class="field"><label>المجموعات</label><input type="number" value="3" disabled></div>
+          <div class="field"><label>التكرارات</label><input type="number" value="10" disabled></div>
+          <div class="field"><label>الوزن (كجم)</label><input type="number" value="0" disabled></div>
+        </div>
+        <div style="margin-top:10px;color:#a9b0ba;font-size:12px">للتسجيل والحفظ التفاعلي افتح الموقع عبر متصفح/استضافة ويب.</div>
+      </div>
+    </article>
+    <article class="card">
+      <div class="card-img" style="background-image:url('https://images.unsplash.com/photo-1538805060514-97d9cc17730c?auto=format&fit=crop&w=900&q=80')">
+        <div class="card-title">مشي على السير</div>
+      </div>
+      <div class="card-body">
+        <span class="tag">كارديو</span>
+        <div class="inputs">
+          <div class="field"><label>المجموعات</label><input type="number" value="3" disabled></div>
+          <div class="field"><label>التكرارات</label><input type="number" value="10" disabled></div>
+          <div class="field"><label>الوزن (كجم)</label><input type="number" value="0" disabled></div>
+        </div>
+        <div style="margin-top:10px;color:#a9b0ba;font-size:12px">للتسجيل والحفظ التفاعلي افتح الموقع عبر متصفح/استضافة ويب.</div>
+      </div>
+    </article>
+    <article class="card">
+      <div class="card-img" style="background-image:url('https://images.unsplash.com/photo-1594737625785-a6cbdabd333c?auto=format&fit=crop&w=900&q=80')">
+        <div class="card-title">دراجة ثابتة</div>
+      </div>
+      <div class="card-body">
+        <span class="tag">كارديو</span>
+        <div class="inputs">
+          <div class="field"><label>المجموعات</label><input type="number" value="3" disabled></div>
+          <div class="field"><label>التكرارات</label><input type="number" value="10" disabled></div>
+          <div class="field"><label>الوزن (كجم)</label><input type="number" value="0" disabled></div>
+        </div>
+        <div style="margin-top:10px;color:#a9b0ba;font-size:12px">للتسجيل والحفظ التفاعلي افتح الموقع عبر متصفح/استضافة ويب.</div>
+      </div>
+    </article>
+    <article class="card">
+      <div class="card-img" style="background-image:url('https://images.unsplash.com/photo-1538805060514-97d9cc17730c?auto=format&fit=crop&w=900&q=80')">
+        <div class="card-title">إليبتيكال</div>
+      </div>
+      <div class="card-body">
+        <span class="tag">كارديو</span>
+        <div class="inputs">
+          <div class="field"><label>المجموعات</label><input type="number" value="3" disabled></div>
+          <div class="field"><label>التكرارات</label><input type="number" value="10" disabled></div>
+          <div class="field"><label>الوزن (كجم)</label><input type="number" value="0" disabled></div>
+        </div>
+        <div style="margin-top:10px;color:#a9b0ba;font-size:12px">للتسجيل والحفظ التفاعلي افتح الموقع عبر متصفح/استضافة ويب.</div>
+      </div>
+    </article>
+    <article class="card">
+      <div class="card-img" style="background-image:url('https://images.unsplash.com/photo-1517838277536-f5f99be501a1?auto=format&fit=crop&w=900&q=80')">
+        <div class="card-title">بيربي</div>
+      </div>
+      <div class="card-body">
+        <span class="tag">كامل الجسم</span>
+        <div class="inputs">
+          <div class="field"><label>المجموعات</label><input type="number" value="3" disabled></div>
+          <div class="field"><label>التكرارات</label><input type="number" value="10" disabled></div>
+          <div class="field"><label>الوزن (كجم)</label><input type="number" value="0" disabled></div>
+        </div>
+        <div style="margin-top:10px;color:#a9b0ba;font-size:12px">للتسجيل والحفظ التفاعلي افتح الموقع عبر متصفح/استضافة ويب.</div>
+      </div>
+    </article>
+    <article class="card">
+      <div class="card-img" style="background-image:url('https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=900&q=80')">
+        <div class="card-title">فارمرز كاري</div>
+      </div>
+      <div class="card-body">
+        <span class="tag">كامل الجسم</span>
+        <div class="inputs">
+          <div class="field"><label>المجموعات</label><input type="number" value="3" disabled></div>
+          <div class="field"><label>التكرارات</label><input type="number" value="10" disabled></div>
+          <div class="field"><label>الوزن (كجم)</label><input type="number" value="0" disabled></div>
+        </div>
+        <div style="margin-top:10px;color:#a9b0ba;font-size:12px">للتسجيل والحفظ التفاعلي افتح الموقع عبر متصفح/استضافة ويب.</div>
+      </div>
+    </article>
+    <article class="card">
+      <div class="card-img" style="background-image:url('https://images.unsplash.com/photo-1517963879433-6ad2b056d3c3?auto=format&fit=crop&w=900&q=80')">
+        <div class="card-title">كيتل بيل سوينغ</div>
+      </div>
+      <div class="card-body">
+        <span class="tag">كامل الجسم</span>
+        <div class="inputs">
+          <div class="field"><label>المجموعات</label><input type="number" value="3" disabled></div>
+          <div class="field"><label>التكرارات</label><input type="number" value="10" disabled></div>
+          <div class="field"><label>الوزن (كجم)</label><input type="number" value="0" disabled></div>
+        </div>
+        <div style="margin-top:10px;color:#a9b0ba;font-size:12px">للتسجيل والحفظ التفاعلي افتح الموقع عبر متصفح/استضافة ويب.</div>
+      </div>
+    </article>
+    <article class="card">
+      <div class="card-img" style="background-image:url('https://images.unsplash.com/photo-1598971639058-fab3c3109a00?auto=format&fit=crop&w=900&q=80')">
+        <div class="card-title">ضغط</div>
+      </div>
+      <div class="card-body">
+        <span class="tag">كامل الجسم</span>
+        <div class="inputs">
+          <div class="field"><label>المجموعات</label><input type="number" value="3" disabled></div>
+          <div class="field"><label>التكرارات</label><input type="number" value="10" disabled></div>
+          <div class="field"><label>الوزن (كجم)</label><input type="number" value="0" disabled></div>
+        </div>
+        <div style="margin-top:10px;color:#a9b0ba;font-size:12px">للتسجيل والحفظ التفاعلي افتح الموقع عبر متصفح/استضافة ويب.</div>
+      </div>
+    </article>
+  </div>
+</noscript>
+<div class="empty" id="empty">لا توجد تمارين مطابقة لبحثك.</div>
+</main>
+
+<div id="modal" class="modal" onclick="if(event.target===this)closeInfo()">
+<div class="modal-box"><button class="close" onclick="closeInfo()">إغلاق</button><div id="modalContent"></div></div>
+</div>
+<script>
+const exercises=[
+["صدر","بنش برس بالبار","https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?auto=format&fit=crop&w=900&q=80"],
+["صدر","بنش برس بالدمبل","https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=900&q=80"],
+["صدر","بنش مائل بالبار","https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=900&q=80"],
+["صدر","بنش مائل بالدمبل","https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=900&q=80"],
+["صدر","بنش مائل للأسفل","https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?auto=format&fit=crop&w=900&q=80"],
+["صدر","تفتيح دمبل","https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=900&q=80"],
+["صدر","كيبل فلاي","https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=900&q=80"],
+["صدر","بيك ديك","https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?auto=format&fit=crop&w=900&q=80"],
+["صدر","ضغط صدر جهاز","https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=900&q=80"],
+["صدر","ضغط أرضي","https://images.unsplash.com/photo-1598971639058-fab3c3109a00?auto=format&fit=crop&w=900&q=80"],
+["ظهر","سحب أمامي واسع","https://images.unsplash.com/photo-1603287681836-b174ce5074c2?auto=format&fit=crop&w=900&q=80"],
+["ظهر","سحب أمامي قبضة ضيقة","https://images.unsplash.com/photo-1603287681836-b174ce5074c2?auto=format&fit=crop&w=900&q=80"],
+["ظهر","عقلة","https://images.unsplash.com/photo-1598971639058-fab3c3109a00?auto=format&fit=crop&w=900&q=80"],
+["ظهر","باربل رو","https://images.unsplash.com/photo-1598971639058-fab3c3109a00?auto=format&fit=crop&w=900&q=80"],
+["ظهر","دمبل رو يد واحدة","https://images.unsplash.com/photo-1603287681836-b174ce5074c2?auto=format&fit=crop&w=900&q=80"],
+["ظهر","تي بار رو","https://images.unsplash.com/photo-1598971639058-fab3c3109a00?auto=format&fit=crop&w=900&q=80"],
+["ظهر","سيتد كيبل رو","https://images.unsplash.com/photo-1576678927484-cc907957088c?auto=format&fit=crop&w=900&q=80"],
+["ظهر","ستريت آرم بول داون","https://images.unsplash.com/photo-1603287681836-b174ce5074c2?auto=format&fit=crop&w=900&q=80"],
+["ظهر","ديدلفت","https://images.unsplash.com/photo-1598971639058-fab3c3109a00?auto=format&fit=crop&w=900&q=80"],
+["ظهر","شراگ بار","https://images.unsplash.com/photo-1598971639058-fab3c3109a00?auto=format&fit=crop&w=900&q=80"],
+["أكتاف","ضغط كتف بالبار","https://images.unsplash.com/photo-1534367610401-9f5ed68180aa?auto=format&fit=crop&w=900&q=80"],
+["أكتاف","ضغط كتف دمبل","https://images.unsplash.com/photo-1534367610401-9f5ed68180aa?auto=format&fit=crop&w=900&q=80"],
+["أكتاف","ضغط كتف جهاز","https://images.unsplash.com/photo-1534367610401-9f5ed68180aa?auto=format&fit=crop&w=900&q=80"],
+["أكتاف","رفرفة جانبية دمبل","https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?auto=format&fit=crop&w=900&q=80"],
+["أكتاف","رفرفة جانبية كيبل","https://images.unsplash.com/photo-1574680096145-d05b474e2155?auto=format&fit=crop&w=900&q=80"],
+["أكتاف","رفرفة أمامية دمبل","https://images.unsplash.com/photo-1534367610401-9f5ed68180aa?auto=format&fit=crop&w=900&q=80"],
+["أكتاف","رفرفة خلفية","https://images.unsplash.com/photo-1574680096145-d05b474e2155?auto=format&fit=crop&w=900&q=80"],
+["أكتاف","فيس بول","https://images.unsplash.com/photo-1574680096145-d05b474e2155?auto=format&fit=crop&w=900&q=80"],
+["أرجل","سكوات بالبار","https://images.unsplash.com/photo-1538805060514-97d9cc17730c?auto=format&fit=crop&w=900&q=80"],
+["أرجل","فرونت سكوات","https://images.unsplash.com/photo-1538805060514-97d9cc17730c?auto=format&fit=crop&w=900&q=80"],
+["أرجل","هاك سكوات","https://images.unsplash.com/photo-1434596922112-19c563067271?auto=format&fit=crop&w=900&q=80"],
+["أرجل","ليج برس","https://images.unsplash.com/photo-1434596922112-19c563067271?auto=format&fit=crop&w=900&q=80"],
+["أرجل","رومانيان ديدلفت","https://images.unsplash.com/photo-1538805060514-97d9cc17730c?auto=format&fit=crop&w=900&q=80"],
+["أرجل","ليج إكستنشن","https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?auto=format&fit=crop&w=900&q=80"],
+["أرجل","ليج كيرل جالس","https://images.unsplash.com/photo-1434596922112-19c563067271?auto=format&fit=crop&w=900&q=80"],
+["أرجل","ليج كيرل مستلقٍ","https://images.unsplash.com/photo-1434596922112-19c563067271?auto=format&fit=crop&w=900&q=80"],
+["أرجل","هيب ثرست","https://images.unsplash.com/photo-1538805060514-97d9cc17730c?auto=format&fit=crop&w=900&q=80"],
+["أرجل","لانجز","https://images.unsplash.com/photo-1538805060514-97d9cc17730c?auto=format&fit=crop&w=900&q=80"],
+["أرجل","كالف ريز واقف","https://images.unsplash.com/photo-1434596922112-19c563067271?auto=format&fit=crop&w=900&q=80"],
+["أرجل","كالف ريز جالس","https://images.unsplash.com/photo-1434596922112-19c563067271?auto=format&fit=crop&w=900&q=80"],
+["بايسبس","باربل كيرل","https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=900&q=80"],
+["بايسبس","EZ بار كيرل","https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=900&q=80"],
+["بايسبس","دمبل كيرل","https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=900&q=80"],
+["بايسبس","هامر كيرل","https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=900&q=80"],
+["بايسبس","بريشر كيرل","https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=900&q=80"],
+["بايسبس","كيبل كيرل","https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=900&q=80"],
+["ترايسبس","كيبل بوش داون","https://images.unsplash.com/photo-1598971639058-fab3c3109a00?auto=format&fit=crop&w=900&q=80"],
+["ترايسبس","روپ بوش داون","https://images.unsplash.com/photo-1598971639058-fab3c3109a00?auto=format&fit=crop&w=900&q=80"],
+["ترايسبس","سكَل كراشر","https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?auto=format&fit=crop&w=900&q=80"],
+["ترايسبس","تمديد فوق الرأس بالدمبل","https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?auto=format&fit=crop&w=900&q=80"],
+["ترايسبس","ديبس","https://images.unsplash.com/photo-1598971639058-fab3c3109a00?auto=format&fit=crop&w=900&q=80"],
+["بطن","كرنش","https://images.unsplash.com/photo-1549060279-7e168fcee0c2?auto=format&fit=crop&w=900&q=80"],
+["بطن","كرنش كيبل","https://images.unsplash.com/photo-1549060279-7e168fcee0c2?auto=format&fit=crop&w=900&q=80"],
+["بطن","رفع الأرجل","https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=900&q=80"],
+["بطن","بلانك","https://images.unsplash.com/photo-1549060279-7e168fcee0c2?auto=format&fit=crop&w=900&q=80"],
+["بطن","روشن روسيان تويست","https://images.unsplash.com/photo-1549060279-7e168fcee0c2?auto=format&fit=crop&w=900&q=80"],
+["كارديو","جري على السير","https://images.unsplash.com/photo-1538805060514-97d9cc17730c?auto=format&fit=crop&w=900&q=80"],
+["كارديو","مشي على السير","https://images.unsplash.com/photo-1538805060514-97d9cc17730c?auto=format&fit=crop&w=900&q=80"],
+["كارديو","دراجة ثابتة","https://images.unsplash.com/photo-1594737625785-a6cbdabd333c?auto=format&fit=crop&w=900&q=80"],
+["كارديو","إليبتيكال","https://images.unsplash.com/photo-1538805060514-97d9cc17730c?auto=format&fit=crop&w=900&q=80"],
+["كامل الجسم","بيربي","https://images.unsplash.com/photo-1517838277536-f5f99be501a1?auto=format&fit=crop&w=900&q=80"],
+["كامل الجسم","فارمرز كاري","https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=900&q=80"],
+["كامل الجسم","كيتل بيل سوينغ","https://images.unsplash.com/photo-1517963879433-6ad2b056d3c3?auto=format&fit=crop&w=900&q=80"],
+["كامل الجسم","ضغط","https://images.unsplash.com/photo-1598971639058-fab3c3109a00?auto=format&fit=crop&w=900&q=80"]
+];
+
+const exerciseDetails={
+"بنش برس بالبار":["الصدر، الترايسبس، الكتف الأمامي","استلقِ على البنش وثبّت القدمين. أمسك البار أوسع قليلاً من الكتفين، اخفضه بتحكم نحو منتصف الصدر ثم ادفعه للأعلى مع إبقاء الكتفين ثابتين.","Barbell Bench Press"],
+"بنش برس بالدمبل":["الصدر، الترايسبس، الكتف الأمامي","ابدأ بالدمبلين فوق الصدر، اخفضهما ببطء حتى مستوى مريح ثم ادفعهما للأعلى دون قفل المرفقين بعنف.","Dumbbell Bench Press"],
+"بنش مائل بالبار":["أعلى الصدر، الكتف الأمامي، الترايسبس","اضبط البنش على ميل متوسط، اخفض البار باتجاه أعلى الصدر ثم ادفعه للأعلى مع التحكم الكامل.","Incline Barbell Bench Press"],
+"بنش مائل بالدمبل":["أعلى الصدر، الكتف الأمامي، الترايسبس","ارفع الدمبلين فوق أعلى الصدر، انزلهما بتحكم ثم ادفعهما للأعلى مع الحفاظ على مسار ثابت.","Incline Dumbbell Bench Press"],
+"تفتيح دمبل":["الصدر","مع ثني خفيف للمرفقين، افتح الذراعين حتى تشعر بتمدد مناسب في الصدر ثم أعدهما معاً دون اصطدام الدمبلين.","Dumbbell Fly"],
+"كيبل فلاي":["الصدر","قف في منتصف جهاز الكيبل، اسحب المقابض إلى الأمام بقوس متحكم، ثم ارجع ببطء.","Cable Fly"],
+"سحب أمامي واسع":["اللاتس، أعلى الظهر، البايسبس","اسحب المقبض باتجاه أعلى الصدر مع إبقاء الجذع ثابتاً، ثم دع الذراعين يعودان ببطء دون رمي الوزن.","Lat Pulldown"],
+"عقلة":["اللاتس، البايسبس، أعلى الظهر","ابدأ من تعليق متحكم، اسحب جسمك حتى يقترب الذقن من البار، ثم انزل ببطء.","Pull Up"],
+"باربل رو":["اللاتس، الرومبويد، الترابيس، البايسبس","اثنِ الورك مع ظهر محايد، اسحب البار باتجاه أسفل البطن ثم اخفضه بتحكم.","Barbell Row"],
+"دمبل رو يد واحدة":["اللاتس، أعلى الظهر، البايسبس","ثبّت يدك وركبتك على البنش، اسحب الدمبل نحو الخاصرة ثم اخفضه ببطء.","One Arm Dumbbell Row"],
+"ديدلفت":["أوتار الركبة، المؤخرة، الظهر، الترابيس","ابدأ بالبار قريباً من الساقين وظهر محايد، ادفع الأرض بقدميك ومد الورك حتى الوقوف، ثم انزل بتحكم.","Deadlift"],
+"ضغط كتف بالبار":["الكتف، الترايسبس","من وضع الوقوف أو الجلوس، ادفع البار فوق الرأس مع تثبيت الجذع ثم اخفضه ببطء.","Barbell Shoulder Press"],
+"ضغط كتف دمبل":["الكتف، الترايسبس","ادفع الدمبلين من مستوى الكتفين إلى أعلى الرأس، ثم اخفضهما بتحكم.","Dumbbell Shoulder Press"],
+"رفرفة جانبية دمبل":["الكتف الجانبي","ارفع الدمبلين جانبياً حتى قرب مستوى الكتف مع مرفقين مرتخيين، ثم اخفضهما ببطء.","Dumbbell Lateral Raise"],
+"رفرفة خلفية":["الكتف الخلفي، أعلى الظهر","انحنِ للأمام مع ظهر محايد، افتح الذراعين جانبياً ثم عد ببطء.","Rear Delt Fly"],
+"سكوات بالبار":["العضلات الرباعية، المؤخرة، أوتار الركبة","ضع البار بثبات، انزل مع ثبات الركبتين باتجاه القدمين وظهر محايد، ثم ادفع الأرض للعودة.","Barbell Squat"],
+"ليج برس":["الرباعية، المؤخرة، أوتار الركبة","ضع القدمين بثبات على المنصة، اخفض الوزن بتحكم ضمن مدى مريح ثم ادفع المنصة دون قفل الركبتين بعنف.","Leg Press"],
+"رومانيان ديدلفت":["أوتار الركبة، المؤخرة","ادفع الورك للخلف مع ركبتين مثنيتين قليلاً وظهر محايد، ثم ادفع الورك للأمام للعودة.","Romanian Deadlift"],
+"ليج إكستنشن":["العضلات الرباعية","اضبط الجهاز على مفصل الركبة، مد الساقين بتحكم ثم اخفضهما ببطء.","Leg Extension"],
+"ليج كيرل جالس":["أوتار الركبة","ثبت الفخذين، اسحب الوسادة للخلف بثني الركبة ثم عد ببطء.","Seated Leg Curl"],
+"هيب ثرست":["المؤخرة، أوتار الركبة","ثبّت أعلى ظهرك على البنش، ادفع الورك للأعلى حتى يصبح الجذع والفخذان قريبين من خط واحد ثم انزل بتحكم.","Hip Thrust"],
+"باربل كيرل":["البايسبس","ثبّت المرفقين قرب الجسم، ارفع البار بثني المرفقين ثم اخفضه ببطء دون تأرجح.","Barbell Curl"],
+"دمبل كيرل":["البايسبس","ارفع الدمبل مع ثبات المرفق، ثم اخفضه بتحكم كامل.","Dumbbell Curl"],
+"هامر كيرل":["البايسبس، العضلة العضدية، الساعد","أمسك الدمبل بقبضة محايدة وارفعه مع إبقاء المرفق ثابتاً.","Hammer Curl"],
+"كيبل بوش داون":["الترايسبس","ثبت المرفقين بجانب الجسم وادفع المقبض للأسفل حتى تمد الذراعين ثم عد ببطء.","Cable Pushdown"],
+"سكَل كراشر":["الترايسبس","استلقِ على البنش، اخفض البار باتجاه الجبهة مع ثبات أعلى الذراعين ثم مد المرفقين.","Skull Crusher"],
+"ديبس":["الترايسبس، الصدر، الكتف الأمامي","انزل بتحكم بين المتوازيين مع إبقاء الكتفين ثابتين، ثم ادفع الجسم للأعلى.","Dips"],
+"كرنش":["عضلات البطن","ارفع الجزء العلوي من الجسم بثني الجذع مع إبقاء الحركة من البطن، ثم عد ببطء.","Crunch"],
+"رفع الأرجل":["أسفل البطن، عضلات الورك","ارفع الساقين بتحكم دون تأرجح ثم اخفضهما ببطء.","Leg Raise"],
+"بلانك":["البطن، الجذع","حافظ على الجسم في خط مستقيم، شد البطن والمؤخرة وتنفس بشكل طبيعي.","Plank"],
+"جري على السير":["عضلات الساقين، الجهاز القلبي التنفسي","ابدأ بسرعة مناسبة لك، حافظ على وضعية مستقيمة وخطوات منتظمة وزد الشدة تدريجياً.","Treadmill Running"],
+"دراجة ثابتة":["الفخذين، المؤخرة، الجهاز القلبي التنفسي","اضبط المقعد بحيث تكون الركبة مرتاحة، ثم حافظ على إيقاع منتظم وزد المقاومة تدريجياً.","Stationary Bike"]
+};
+function showInfo(name){
+ const d=exerciseDetails[name]||["العضلات حسب نوع الحركة","هذه الحركة تعتمد على المجموعة العضلية الموضحة في بطاقة التمرين. استخدم وزناً يسمح لك بالحركة بتحكم كامل.",""+name];
+ document.getElementById("modalContent").innerHTML=`<h2>${name}</h2><p><b>العضلات المستهدفة:</b> ${d[0]}</p><p><b>طريقة الأداء:</b> ${d[1]}</p><a class="video-link" target="_blank" rel="noopener" href="https://www.youtube.com/results?search_query=${encodeURIComponent(d[2]+" proper form exercise")}">▶️ مشاهدة شرح فيديو</a>`;
+ document.getElementById("modal").classList.add("show");
+}
+function closeInfo(){document.getElementById("modal").classList.remove("show")}
+
+const cats=["الكل",...new Set(exercises.map(x=>x[0]))]; let active="الكل";
+const filters=document.getElementById("filters");
+cats.forEach(c=>{const b=document.createElement("button");b.className="chip"+(c==="الكل"?" active":"");b.textContent=c;b.onclick=()=>{active=c;document.querySelectorAll(".chip").forEach(x=>x.classList.remove("active"));b.classList.add("active");render()};filters.appendChild(b)});
+function key(name){return "gym_"+name}
+function render(){
+ const q=document.getElementById("search").value.trim().toLowerCase();
+ const data=exercises.filter(e=>(active==="الكل"||e[0]===active)&&e[1].toLowerCase().includes(q));
+ const grid=document.getElementById("grid");grid.innerHTML="";
+ data.forEach((e,i)=>{
+  const old=JSON.parse(localStorage.getItem(key(e[1]))||"{}");
+  const card=document.createElement("article");card.className="card";
+  card.innerHTML=`<div class="card-img" style="background-image:url('${e[2]}')"><div class="card-title">${e[1]}</div></div>
+  <div class="card-body"><span class="tag">${e[0]}</span>
+  <button class="info" onclick="showInfo('${e[1]}')">ℹ️ طريقة الأداء والعضلات</button>
+  <div class="inputs">
+   <div class="field"><label>المجموعات</label><input type="number" min="0" id="sets${i}" value="${old.sets||3}"></div>
+   <div class="field"><label>التكرارات</label><input type="number" min="0" id="reps${i}" value="${old.reps||10}"></div>
+   <div class="field"><label>الوزن (كجم)</label><input type="number" min="0" step="0.5" id="weight${i}" value="${old.weight||0}"></div>
+  </div><button class="save ${old.saved?'saved':''}" onclick="save('${e[1]}',${i},this)">${old.saved?'✓ محفوظ':'حفظ التمرين'}</button></div>`;
+  grid.appendChild(card);
+ });
+ document.getElementById("empty").style.display=data.length?"none":"block"; updateStats();
+}
+function save(name,i,btn){
+ const obj={sets:+document.getElementById("sets"+i).value||0,reps:+document.getElementById("reps"+i).value||0,weight:+document.getElementById("weight"+i).value||0,saved:true};
+ localStorage.setItem(key(name),JSON.stringify(obj));btn.classList.add("saved");btn.textContent="✓ محفوظ";updateStats();
+}
+function updateStats(){
+ let n=0,vol=0,max=0;
+ exercises.forEach(e=>{const o=JSON.parse(localStorage.getItem(key(e[1]))||"null");if(o?.saved){n++;vol+=o.reps*o.sets;max=Math.max(max,o.weight)}});
+ document.getElementById("count").textContent=n;document.getElementById("volume").textContent=vol;document.getElementById("weight").textContent=max;
+}
+function clearAll(){if(confirm("هل تريد حذف جميع بيانات التمارين؟")){exercises.forEach(e=>localStorage.removeItem(key(e[1])));render()}}
+render();
+</script>
+</body>
+</html>
