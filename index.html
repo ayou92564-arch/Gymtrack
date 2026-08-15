@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#080a0c">
+<title>GymTrack Pro</title>
+<style>
+*{box-sizing:border-box}
+:root{--bg:#07090b;--panel:#101317;--panel2:#151a1f;--line:#242a30;--text:#f5f7f9;--muted:#9da5ae;--green:#8cff00}
+body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Tahoma,Arial,sans-serif}
+button,input,select{font:inherit}button{cursor:pointer}
+.app{min-height:100vh;display:grid;grid-template-columns:250px 1fr}
+.sidebar{position:sticky;top:0;height:100vh;padding:22px 14px;border-right:1px solid var(--line);background:#0b0e11}
+.logo{font-size:23px;font-weight:950;padding:4px 10px 28px}.logo span{color:var(--green)}
+.nav-title{font-size:11px;color:#68727d;font-weight:900;padding:0 12px 8px;text-transform:uppercase;letter-spacing:1px}
+.nav{display:grid;gap:6px}.nav button{width:100%;text-align:left;border:1px solid transparent;background:transparent;color:#bfc7cf;padding:12px;border-radius:12px;font-weight:800}
+.nav button.active{background:var(--green);color:#080b07}
+.sidebar-bottom{position:absolute;bottom:18px;left:14px;right:14px}.clear{width:100%;border:1px solid var(--line);background:#171c21;color:#fff;border-radius:11px;padding:10px;font-weight:800}
+.main{min-width:0}.top{height:66px;position:sticky;top:0;z-index:20;background:rgba(7,9,11,.94);backdrop-filter:blur(16px);border-bottom:1px solid var(--line);padding:14px 24px;display:flex;align-items:center;justify-content:space-between}
+.mobile-logo{display:none;font-weight:900}.wrap{max-width:1250px;margin:auto;padding:24px 26px 90px}
+.hero{padding:8px 0 18px}.eyebrow{color:var(--green);font-weight:900}.hero h1{font-size:clamp(32px,5vw,58px);line-height:1.03;margin:9px 0}.sub,.muted{color:var(--muted)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:12px 0 24px}.stat,.panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px}.stat strong{display:block;color:var(--green);font-size:25px}.stat span{color:#9da5ae;font-size:13px}
+.view{display:none}.view.active{display:block}
+.section-head{display:flex;align-items:end;justify-content:space-between;gap:15px;margin:8px 0 14px}.section-head h2{margin:0;font-size:25px}
+.controls{display:grid;grid-template-columns:1fr 200px;gap:10px;margin-bottom:14px}
+input,select{width:100%;background:#11151a;color:#fff;border:1px solid #303740;border-radius:12px;padding:13px;outline:none}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+.card{overflow:hidden;background:var(--panel);border:1px solid var(--line);border-radius:17px}.photo{height:155px;background-size:cover;background-position:center;position:relative}.shade{position:absolute;inset:0;background:linear-gradient(transparent 20%,rgba(0,0,0,.88))}.ct{position:absolute;bottom:12px;left:13px;font-size:19px;font-weight:900}.body{padding:14px}.tag{display:inline-block;background:#1c2520;color:#baff72;border-radius:999px;padding:5px 9px;font-size:12px;margin-bottom:10px}.btn{border:0;border-radius:11px;padding:10px 12px;font-weight:850}.primary{background:var(--green);color:#081006}.dark{background:#20262d;color:#fff}.row{display:flex;gap:8px;flex-wrap:wrap}
+.programs{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}.program{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:18px}.program.featured{border-color:#557f24;box-shadow:0 0 0 1px rgba(140,255,0,.08) inset}.program-top{display:flex;justify-content:space-between;gap:10px;align-items:start}.day{color:var(--green);font-weight:900;font-size:12px}.program h3{margin:6px 0;font-size:21px}.program ul{padding-left:20px;color:#c4cbd2;line-height:1.8}.program li{margin:2px 0}.badge{background:#1a2418;color:#baff72;padding:5px 9px;border-radius:999px;font-size:11px;font-weight:900}
+.plan{margin-top:18px}.plan-row{display:grid;grid-template-columns:90px 1fr auto;gap:12px;align-items:center;padding:13px 0;border-bottom:1px solid #252b31}.plan-day{font-weight:900;color:var(--green)}.plan-name{font-weight:800}.plan-ex{color:var(--muted);font-size:13px;margin-top:3px}
+.history-item{display:flex;justify-content:space-between;gap:10px;padding:12px 0;border-bottom:1px solid #252b31}.empty{padding:35px;text-align:center;color:#87909a}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.82);display:none;align-items:flex-end;justify-content:center;z-index:50}.modal.show{display:flex}.sheet{width:min(720px,100%);max-height:92vh;overflow:auto;background:#11151a;border:1px solid #303740;border-radius:22px 22px 0 0;padding:18px}.close{float:right;background:#242a31;color:#fff;border:0;border-radius:10px;padding:8px 12px}.timer{text-align:center;font-size:54px;font-weight:900;margin:12px 0;color:var(--green)}.sets{margin-top:12px;display:grid;gap:8px}.setrow{display:grid;grid-template-columns:42px 1fr 1fr 38px;gap:6px;align-items:center}.setnum{color:var(--green);font-weight:900;text-align:center}
+.mobile-nav{display:none}
+@media(max-width:850px){
+.app{display:block}.sidebar{display:none}.top{height:60px;padding:12px 15px}.mobile-logo{display:block}.wrap{padding:18px 13px 90px}.stats{grid-template-columns:repeat(2,1fr)}.controls{grid-template-columns:1fr}.mobile-nav{display:grid;grid-template-columns:repeat(4,1fr);position:fixed;bottom:0;left:0;right:0;z-index:40;background:#0c1013;border-top:1px solid var(--line);padding:7px;gap:5px}.mobile-nav button{border:0;background:transparent;color:#aeb6c0;padding:8px 4px;border-radius:10px;font-size:11px;font-weight:800}.mobile-nav button.active{background:var(--green);color:#080b07}.plan-row{grid-template-columns:70px 1fr}.plan-row .btn{display:none}
+}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+  <div class="logo">GYM<span>TRACK</span> PRO</div>
+  <div class="nav-title">MAIN MENU</div>
+  <nav class="nav">
+    <button class="active" data-view="programs">🏋️ Programs</button>
+    <button data-view="exercises">💪 Exercises</button>
+    <button data-view="history">📈 Progress</button>
+    <button data-view="timer">⏱️ Rest Timer</button>
+  </nav>
+  <div class="sidebar-bottom"><button class="clear" onclick="clearAll()">Clear All Data</button></div>
+</aside>
+
+<div class="main">
+<header class="top"><div class="mobile-logo">GYM<span style="color:var(--green)">TRACK</span> PRO</div><div class="muted">Your workout. Your progress.</div></header>
+<main class="wrap">
+<section class="hero">
+  <div class="eyebrow">TRAIN • TRACK • PROGRESS</div>
+  <h1>Build your workout.<br>Track every set.</h1>
+  <div class="sub">Choose a training program, open the exercises, log your weights and reps, and keep your progress on your device.</div>
+</section>
+
+<section class="stats">
+  <div class="stat"><strong id="workouts">0</strong><span>Workouts</span></div>
+  <div class="stat"><strong id="sets">0</strong><span>Sets Logged</span></div>
+  <div class="stat"><strong id="volume">0</strong><span>Total Volume (kg)</span></div>
+  <div class="stat"><strong id="records">0</strong><span>Exercises Logged</span></div>
+</section>
+
+<section id="programsView" class="view active">
+  <div class="section-head"><div><h2>Training Programs</h2><div class="muted">Select a program and start your session.</div></div></div>
+  <div class="programs">
+    <article class="program featured">
+      <div class="program-top"><div><div class="day">5 DAYS / WEEK</div><h3>Push / Pull / Legs / Upper / Lower</h3></div><span class="badge">RECOMMENDED</span></div>
+      <ul><li><b>Day 1</b> — Push</li><li><b>Day 2</b> — Pull</li><li><b>Day 3</b> — Legs</li><li><b>Day 4</b> — Upper</li><li><b>Day 5</b> — Lower</li></ul>
+      <button class="btn primary" onclick="showProgram('pplul')">View Program</button>
+    </article>
+    <article class="program">
+      <div class="program-top"><div><div class="day">4 DAYS / WEEK</div><h3>Upper / Lower</h3></div></div>
+      <ul><li>Upper A</li><li>Lower A</li><li>Upper B</li><li>Lower B</li></ul>
+      <button class="btn dark" onclick="showProgram('ul')">View Program</button>
+    </article>
+    <article class="program">
+      <div class="program-top"><div><div class="day">3 DAYS / WEEK</div><h3>Full Body</h3></div></div>
+      <ul><li>Full Body A</li><li>Full Body B</li><li>Full Body C</li></ul>
+      <button class="btn dark" onclick="showProgram('full')">View Program</button>
+    </article>
+  </div>
+  <div id="programPlan" class="panel plan" style="display:none"></div>
+</section>
+
+<section id="exercisesView" class="view">
+  <div class="section-head"><div><h2>Exercise Library</h2><div class="muted">All exercise names are in English.</div></div></div>
+  <div class="controls"><input id="search" placeholder="🔎 Search exercises..."><select id="muscle"><option value="all">All Muscles</option></select></div>
+  <div id="grid" class="grid"></div>
+</section>
+
+<section id="historyView" class="view"><div class="panel"><div class="section-head"><div><h2>📈 Progress History</h2><div class="muted">Your saved workout sets.</div></div></div><div id="history"></div></div></section>
+
+<section id="timerView" class="view"><div class="panel" style="text-align:center;max-width:600px;margin:auto"><h2>⏱️ Rest Timer</h2><div id="timer" class="timer">01:30</div><div class="row" style="justify-content:center"><button class="btn primary" onclick="startTimer()">Start</button><button class="btn dark" onclick="pauseTimer()">Pause</button><button class="btn dark" onclick="resetTimer()">Reset</button></div><p class="muted">Rest duration (seconds)</p><input id="timerInput" type="number" min="10" max="600" value="90" style="max-width:180px;text-align:center"></div></section>
+</main>
+</div>
+</div>
+
+<nav class="mobile-nav">
+<button class="active" data-view="programs">🏋️<br>Programs</button>
+<button data-view="exercises">💪<br>Exercises</button>
+<button data-view="history">📈<br>Progress</button>
+<button data-view="timer">⏱️<br>Timer</button>
+</nav>
+
+<div id="modal" class="modal" onclick="if(event.target===this)closeModal()"><div class="sheet"><button class="close" onclick="closeModal()">Close</button><div id="modalContent"></div></div></div>
+
+<script>
+const exercises=[
+["Chest","Barbell Bench Press"],["Chest","Dumbbell Bench Press"],["Chest","Incline Barbell Bench Press"],["Chest","Incline Dumbbell Bench Press"],["Chest","Decline Bench Press"],["Chest","Dumbbell Fly"],["Chest","Cable Fly"],["Chest","Pec Deck"],["Chest","Machine Chest Press"],["Chest","Push-Up"],
+["Back","Wide-Grip Lat Pulldown"],["Back","Close-Grip Lat Pulldown"],["Back","Pull-Up"],["Back","Barbell Row"],["Back","One-Arm Dumbbell Row"],["Back","T-Bar Row"],["Back","Seated Cable Row"],["Back","Straight-Arm Pulldown"],["Back","Deadlift"],["Back","Barbell Shrug"],
+["Shoulders","Barbell Shoulder Press"],["Shoulders","Dumbbell Shoulder Press"],["Shoulders","Machine Shoulder Press"],["Shoulders","Dumbbell Lateral Raise"],["Shoulders","Cable Lateral Raise"],["Shoulders","Dumbbell Front Raise"],["Shoulders","Rear Delt Fly"],["Shoulders","Face Pull"],
+["Legs","Barbell Squat"],["Legs","Front Squat"],["Legs","Hack Squat"],["Legs","Leg Press"],["Legs","Romanian Deadlift"],["Legs","Leg Extension"],["Legs","Seated Leg Curl"],["Legs","Lying Leg Curl"],["Legs","Hip Thrust"],["Legs","Lunges"],["Legs","Standing Calf Raise"],["Legs","Seated Calf Raise"],
+["Biceps","Barbell Curl"],["Biceps","EZ-Bar Curl"],["Biceps","Dumbbell Curl"],["Biceps","Hammer Curl"],["Biceps","Preacher Curl"],["Biceps","Cable Curl"],
+["Triceps","Cable Pushdown"],["Triceps","Rope Pushdown"],["Triceps","Skull Crusher"],["Triceps","Dumbbell Overhead Extension"],["Triceps","Dips"],
+["Abs","Crunch"],["Abs","Cable Crunch"],["Abs","Leg Raise"],["Abs","Plank"],["Abs","Russian Twist"],
+["Cardio","Treadmill Run"],["Cardio","Treadmill Walk"],["Cardio","Stationary Bike"],["Cardio","Elliptical"],
+["Full Body","Burpee"],["Full Body","Farmer's Carry"],["Full Body","Kettlebell Swing"],["Full Body","Push-Up"]
+].map((e,i)=>({muscle:e[0],name:e[1],img:[
+"https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?auto=format&fit=crop&w=900&q=80",
+"https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=900&q=80",
+"https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=900&q=80",
+"https://images.unsplash.com/photo-1598971639058-fab3c3109a00?auto=format&fit=crop&w=900&q=80"
+][i%4]}));
+
+const programs={
+pplul:[
+["DAY 1","Push","Barbell Bench Press • Incline Dumbbell Bench Press • Machine Chest Press • Dumbbell Lateral Raise • Cable Pushdown"],
+["DAY 2","Pull","Wide-Grip Lat Pulldown • Barbell Row • Seated Cable Row • Face Pull • Barbell Curl • Hammer Curl"],
+["DAY 3","Legs","Barbell Squat • Leg Press • Romanian Deadlift • Leg Extension • Seated Leg Curl • Standing Calf Raise"],
+["DAY 4","Upper","Dumbbell Bench Press • Wide-Grip Lat Pulldown • Incline Dumbbell Bench Press • Seated Cable Row • Lateral Raise • Cable Curl • Rope Pushdown"],
+["DAY 5","Lower","Hack Squat • Romanian Deadlift • Leg Press • Lying Leg Curl • Leg Extension • Seated Calf Raise"]
+],
+ul:[
+["DAY 1","Upper A","Barbell Bench Press • Wide-Grip Lat Pulldown • Dumbbell Shoulder Press • Seated Cable Row • Dumbbell Lateral Raise • Barbell Curl • Cable Pushdown"],
+["DAY 2","Lower A","Barbell Squat • Romanian Deadlift • Leg Press • Leg Extension • Seated Leg Curl • Standing Calf Raise"],
+["DAY 3","Upper B","Incline Dumbbell Bench Press • Barbell Row • Machine Chest Press • Lat Pulldown • Face Pull • Hammer Curl • Rope Pushdown"],
+["DAY 4","Lower B","Hack Squat • Hip Thrust • Lying Leg Curl • Leg Extension • Lunges • Seated Calf Raise"]
+],
+full:[
+["DAY 1","Full Body A","Barbell Squat • Barbell Bench Press • Lat Pulldown • Dumbbell Shoulder Press • Cable Curl • Cable Pushdown"],
+["DAY 2","Full Body B","Romanian Deadlift • Incline Dumbbell Bench Press • Seated Cable Row • Leg Press • Lateral Raise • Hammer Curl"],
+["DAY 3","Full Body C","Hack Squat • Machine Chest Press • Wide-Grip Lat Pulldown • Hip Thrust • Face Pull • Rope Pushdown"]
+]};
+
+const key="gymtrack_pro_v2";
+let db=JSON.parse(localStorage.getItem(key)||'{"history":[]}'),timerSec=90,timerInt=null;
+const $=id=>document.getElementById(id);
+const cats=[...new Set(exercises.map(x=>x.muscle))];
+cats.forEach(c=>{let o=document.createElement("option");o.value=c;o.textContent=c;$("muscle").appendChild(o)});
+function save(){localStorage.setItem(key,JSON.stringify(db));updateStats();renderHistory()}
+function updateStats(){let h=db.history;$("workouts").textContent=new Set(h.map(x=>x.date)).size;$("sets").textContent=h.length;$("volume").textContent=Math.round(h.reduce((a,x)=>a+(+x.weight||0)*(+x.reps||0),0)).toLocaleString("en-US");$("records").textContent=new Set(h.map(x=>x.name)).size}
+function esc(v){return v.replaceAll("'","\\\\'")}
+function render(){let q=$("search").value.trim().toLowerCase(),cat=$("muscle").value;let list=exercises.filter(x=>(cat==="all"||x.muscle===cat)&&(!q||x.name.toLowerCase().includes(q)||x.muscle.toLowerCase().includes(q)));$("grid").innerHTML=list.map(x=>`<article class="card"><div class="photo" style="background-image:url('${x.img}')"><div class="shade"></div><div class="ct">${x.name}</div></div><div class="body"><span class="tag">${x.muscle}</span><div class="row"><button class="btn primary" onclick="openExercise('${esc(x.name)}')">Log Workout</button><button class="btn dark" onclick="info('${esc(x.name)}')">ℹ️ Info</button></div></div></article>`).join("")||'<div class="empty">No matching exercises.</div>'}
+function setRow(n){return `<div class="setrow"><div class="setnum">${n}</div><input class="weight" type="number" min="0" step="0.5" placeholder="Weight (kg)"><input class="reps" type="number" min="0" placeholder="Reps"><button class="btn dark" onclick="this.parentElement.remove()">×</button></div>`}
+function openExercise(name){let x=exercises.find(e=>e.name===name);$("modalContent").innerHTML=`<h2>${x.name}</h2><p class="muted">${x.muscle}</p><div class="sets" id="setBox">${[1,2,3].map(setRow).join("")}</div><div class="row" style="margin-top:12px"><button class="btn dark" onclick="addSet()">+ Set</button><button class="btn primary" onclick="saveExercise('${esc(name)}')">💾 Save Workout</button></div>`;$("modal").classList.add("show")}
+function addSet(){$("setBox").insertAdjacentHTML("beforeend",setRow($("setBox").children.length+1))}
+function saveExercise(name){let rows=[...$("setBox").querySelectorAll(".setrow")],now=new Date(),muscle=exercises.find(x=>x.name===name).muscle;rows.forEach(r=>{let w=r.querySelector(".weight").value,rep=r.querySelector(".reps").value;if(w!==""||rep!=="")db.history.push({name,muscle,weight:+w||0,reps:+rep||0,date:now.toLocaleDateString("en-GB"),display:now.toLocaleString("en-GB")})});save();closeModal();alert("Workout saved ✅")}
+function info(name){let x=exercises.find(e=>e.name===name);$("modalContent").innerHTML=`<h2>${x.name}</h2><p><b>Muscle:</b> ${x.muscle}</p><p class="muted">Use controlled form and choose a weight appropriate for your level.</p><a class="btn primary" style="display:inline-block;text-decoration:none" target="_blank" href="https://www.youtube.com/results?search_query=${encodeURIComponent(x.name+" exercise form")}">▶️ Watch Form</a>`;$("modal").classList.add("show")}
+function closeModal(){$("modal").classList.remove("show")}
+function renderHistory(){if(!db.history.length){$("history").innerHTML='<div class="empty">No workouts saved yet.</div>';return}$("history").innerHTML=[...db.history].reverse().map(x=>`<div class="history-item"><div><b>${x.name}</b><div class="muted">${x.display}</div></div><div>${x.weight} kg × ${x.reps}</div></div>`).join("")}
+function clearAll(){if(confirm("Delete all workout history?")){db={history:[]};save()}}
+function show(v){document.querySelectorAll(".view").forEach(x=>x.classList.remove("active"));$(v+"View").classList.add("active");document.querySelectorAll("[data-view]").forEach(b=>b.classList.toggle("active",b.dataset.view===v));if(v==="history")renderHistory()}
+document.querySelectorAll("[data-view]").forEach(b=>b.onclick=()=>show(b.dataset.view));
+$("search").oninput=render;$("muscle").onchange=render;
+function showProgram(id){let p=programs[id];$("programPlan").style.display="block";$("programPlan").innerHTML=`<div class="section-head"><div><h2>${id==="pplul"?"PPL + Upper / Lower":id==="ul"?"Upper / Lower":"Full Body"}</h2><div class="muted">Weekly training plan</div></div><button class="btn dark" onclick="$('programPlan').style.display='none'">Close</button></div>`+p.map(x=>`<div class="plan-row"><div class="plan-day">${x[0]}</div><div><div class="plan-name">${x[1]}</div><div class="plan-ex">${x[2]}</div></div><button class="btn primary" onclick="show('exercises');$("search").value='';render()">Exercises</button></div>`).join("")}
+function drawTimer(){$("timer").textContent=String(Math.floor(timerSec/60)).padStart(2,"0")+":"+String(timerSec%60).padStart(2,"0")}
+function startTimer(){if(timerInt)return;if(timerSec<=0)timerSec=Math.max(10,+$("timerInput").value||90);timerInt=setInterval(()=>{timerSec--;drawTimer();if(timerSec<=0){clearInterval(timerInt);timerInt=null;navigator.vibrate?.([200,100,200]);alert("Rest complete 🔥")}},1000)}
+function pauseTimer(){clearInterval(timerInt);timerInt=null}
+function resetTimer(){pauseTimer();timerSec=Math.max(10,+$("timerInput").value||90);drawTimer()}
+updateStats();render();renderHistory();drawTimer();
+</script>
+</body></html>
